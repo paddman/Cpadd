@@ -17,6 +17,12 @@ class Settings(BaseSettings):
     qwen_max_tokens: int = 1200
     qwen_timeout_seconds: int = 120
 
+    ocr_languages: str = "tha+eng"
+    ocr_dpi: int = 220
+    ocr_max_pages: int = 30
+    ocr_max_upload_mb: int = 20
+    ocr_use_qwen_default: bool = True
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
