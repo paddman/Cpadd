@@ -14,6 +14,11 @@ services:
       QWEN_TEMPERATURE: ${QWEN_TEMPERATURE:-0.2}
       QWEN_MAX_TOKENS: ${QWEN_MAX_TOKENS:-1200}
       QWEN_TIMEOUT_SECONDS: ${QWEN_TIMEOUT_SECONDS:-120}
+      OCR_LANGUAGES: ${OCR_LANGUAGES:-tha+eng}
+      OCR_DPI: ${OCR_DPI:-220}
+      OCR_MAX_PAGES: ${OCR_MAX_PAGES:-30}
+      OCR_MAX_UPLOAD_MB: ${OCR_MAX_UPLOAD_MB:-20}
+      OCR_USE_QWEN_DEFAULT: ${OCR_USE_QWEN_DEFAULT:-true}
     volumes:
       - cpadd-data:/app/data
     extra_hosts:
