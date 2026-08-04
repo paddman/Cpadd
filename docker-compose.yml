@@ -1,0 +1,23 @@
+services:
+  cpadd:
+    build: .
+    container_name: cpadd-cherry-cfo
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      APP_NAME: Cpadd Cherry CFO
+      DATABASE_PATH: /app/data/cpadd.db
+      QWEN_BASE_URL: ${QWEN_BASE_URL:-http://host.docker.internal:8000/v1}
+      QWEN_MODEL: ${QWEN_MODEL:-qwen3.5-9b}
+      QWEN_API_KEY: ${QWEN_API_KEY:-local}
+      QWEN_TEMPERATURE: ${QWEN_TEMPERATURE:-0.2}
+      QWEN_MAX_TOKENS: ${QWEN_MAX_TOKENS:-1200}
+      QWEN_TIMEOUT_SECONDS: ${QWEN_TIMEOUT_SECONDS:-120}
+    volumes:
+      - cpadd-data:/app/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  cpadd-data:
