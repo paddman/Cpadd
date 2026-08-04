@@ -80,3 +80,23 @@ class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=4000)
     period: Literal["day", "week", "month", "year"] = "month"
     scope: ScopeType | Literal["all"] = "personal"
+
+
+class StatementCommitRequest(BaseModel):
+    selected_indices: list[int] | None = None
+    scope: ScopeType | None = None
+    account: str | None = Field(default=None, min_length=1, max_length=80)
+
+    @field_validator("selected_indices")
+    @classmethod
+    def unique_indices(cls, value: list[int] | None) -> list[int] | None:
+        if value is None:
+            return None
+        if any(index < 0 for index in value):
+            raise ValueError("selected_indices ต้องไม่ติดลบ")
+        return sorted(set(value))
+
+    @field_validator("account")
+    @classmethod
+    def strip_account(cls, value: str | None) -> str | None:
+        return value.strip() if value else value

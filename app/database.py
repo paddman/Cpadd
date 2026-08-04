@@ -59,6 +59,66 @@ CREATE TABLE IF NOT EXISTS app_settings (
     value TEXT NOT NULL,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS statement_imports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    filename TEXT NOT NULL,
+    file_sha256 TEXT NOT NULL UNIQUE,
+    mime_type TEXT NOT NULL DEFAULT '',
+    scope TEXT NOT NULL DEFAULT 'personal' CHECK(scope IN (
+        'personal', 'business', 'company_advance'
+    )),
+    account TEXT NOT NULL DEFAULT 'credit_card',
+    bank TEXT NOT NULL DEFAULT '',
+    card_type TEXT NOT NULL DEFAULT '',
+    card_number_masked TEXT NOT NULL DEFAULT '',
+    account_name TEXT NOT NULL DEFAULT '',
+    statement_date TEXT,
+    previous_balance REAL,
+    amount_due REAL,
+    total_balance REAL,
+    currency TEXT NOT NULL DEFAULT 'THB',
+    ocr_engine TEXT NOT NULL DEFAULT '',
+    extraction_method TEXT NOT NULL DEFAULT '',
+    page_count INTEGER NOT NULL DEFAULT 0,
+    raw_text TEXT NOT NULL DEFAULT '',
+    parsed_json TEXT NOT NULL DEFAULT '{}',
+    status TEXT NOT NULL DEFAULT 'previewed' CHECK(status IN (
+        'previewed', 'imported', 'failed'
+    )),
+    error TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    imported_at TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_statement_imports_created
+ON statement_imports(created_at DESC);
+
+CREATE TABLE IF NOT EXISTS statement_import_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    import_id INTEGER NOT NULL REFERENCES statement_imports(id) ON DELETE CASCADE,
+    item_index INTEGER NOT NULL,
+    transaction_date TEXT,
+    posting_date TEXT,
+    description TEXT NOT NULL DEFAULT '',
+    amount REAL NOT NULL DEFAULT 0 CHECK(amount >= 0),
+    direction TEXT NOT NULL DEFAULT 'debit' CHECK(direction IN ('debit', 'credit')),
+    entry_type TEXT NOT NULL DEFAULT 'expense' CHECK(entry_type IN (
+        'income', 'expense', 'savings', 'debt_payment', 'transfer'
+    )),
+    category TEXT NOT NULL DEFAULT 'อื่น ๆ',
+    merchant TEXT NOT NULL DEFAULT '',
+    installment_current INTEGER,
+    installment_total INTEGER,
+    confidence REAL NOT NULL DEFAULT 0 CHECK(confidence >= 0 AND confidence <= 1),
+    selected INTEGER NOT NULL DEFAULT 1 CHECK(selected IN (0, 1)),
+    imported_transaction_id INTEGER REFERENCES transactions(id) ON DELETE SET NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(import_id, item_index)
+);
+
+CREATE INDEX IF NOT EXISTS idx_statement_items_import
+ON statement_import_items(import_id, item_index);
 """
 
 

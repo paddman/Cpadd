@@ -4,8 +4,8 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
@@ -15,6 +15,7 @@ from app.schemas import (
     DebtCreate,
     DebtUpdate,
     QwenSettingsUpdate,
+    StatementCommitRequest,
     TransactionCreate,
 )
 from app.services.finance import dashboard_summary
@@ -23,6 +24,14 @@ from app.services.qwen import (
     get_qwen_settings,
     save_qwen_settings,
     test_qwen_connection,
+)
+from app.services.statement_ocr import analyze_statement, file_sha256
+from app.services.statement_store import (
+    commit_statement_import,
+    find_statement_by_hash,
+    get_statement_import,
+    list_statement_imports,
+    save_statement_preview,
 )
 
 
@@ -33,7 +42,7 @@ async def lifespan(_: FastAPI):
 
 
 settings = get_settings()
-app = FastAPI(title=settings.app_name, version="0.1.0", lifespan=lifespan)
+app = FastAPI(title=settings.app_name, version="0.2.0", lifespan=lifespan)
 
 STATIC_DIR = Path(__file__).parent / "static"
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
@@ -42,7 +51,15 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.get("/health")
 def health() -> dict:
-    return {"ok": True, "service": settings.app_name}
+    return {
+        "ok": True,
+        "service": settings.app_name,
+        "ocr": {
+            "languages": settings.ocr_languages,
+            "max_pages": settings.ocr_max_pages,
+            "max_upload_mb": settings.ocr_max_upload_mb,
+        },
+    }
 
 
 @app.get("/api/dashboard")
@@ -240,9 +257,106 @@ async def cfo_chat(payload: ChatRequest) -> dict:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
 
+@app.get("/api/statements")
+def statements_list(
+    limit: int = Query(default=30, ge=1, le=200),
+) -> list[dict]:
+    return list_statement_imports(limit=limit)
+
+
+@app.get("/api/statements/{import_id}")
+def statement_detail(import_id: int) -> dict:
+    result = get_statement_import(import_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="ไม่พบผล OCR")
+    return result
+
+
+@app.post("/api/statements/preview", status_code=201)
+async def preview_statement(
+    file: UploadFile = File(...),
+    scope: Literal["personal", "business", "company_advance"] = Form("personal"),
+    account: str = Form("credit_card"),
+    use_qwen: bool = Form(settings.ocr_use_qwen_default),
+) -> dict:
+    filename = Path(file.filename or "statement").name
+    account = account.strip()
+    if not account:
+        raise HTTPException(status_code=400, detail="กรุณาระบุบัญชีหรือบัตร")
+
+    max_bytes = settings.ocr_max_upload_mb * 1024 * 1024
+    data = await file.read(max_bytes + 1)
+    await file.close()
+    if not data:
+        raise HTTPException(status_code=400, detail="ไฟล์ว่าง")
+    if len(data) > max_bytes:
+        raise HTTPException(
+            status_code=413,
+            detail=f"ไฟล์ใหญ่เกิน {settings.ocr_max_upload_mb} MB",
+        )
+
+    digest = file_sha256(data)
+    duplicate = find_statement_by_hash(digest)
+    if duplicate is not None:
+        duplicate["duplicate"] = True
+        return duplicate
+
+    try:
+        analysis = await analyze_statement(
+            data,
+            filename,
+            use_qwen=use_qwen,
+        )
+        result = save_statement_preview(
+            filename=filename,
+            file_hash=digest,
+            mime_type=file.content_type or "",
+            scope=scope,
+            account=account,
+            analysis=analysis,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    result["duplicate"] = False
+    return result
+
+
+@app.post("/api/statements/{import_id}/import")
+def import_statement(import_id: int, payload: StatementCommitRequest) -> dict:
+    try:
+        return commit_statement_import(
+            import_id,
+            selected_indices=payload.selected_indices,
+            scope=payload.scope,
+            account=payload.account,
+        )
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+
 @app.get("/", include_in_schema=False)
-def index() -> FileResponse:
+def index() -> HTMLResponse:
     index_file = STATIC_DIR / "index.html"
     if not index_file.exists():
         raise HTTPException(status_code=503, detail="Frontend ยังไม่ถูกติดตั้ง")
-    return FileResponse(index_file)
+    html = index_file.read_text(encoding="utf-8")
+    marker = '<button data-section="settings">Qwen Settings</button>'
+    ocr_button = marker + '\n      <button type="button" onclick="window.location.href=\'/ocr\'">Statement OCR</button>'
+    if marker in html and "Statement OCR</button>" not in html:
+        html = html.replace(marker, ocr_button)
+    return HTMLResponse(html)
+
+
+@app.get("/ocr", include_in_schema=False)
+def ocr_page() -> FileResponse:
+    page = STATIC_DIR / "ocr.html"
+    if not page.exists():
+        raise HTTPException(status_code=503, detail="หน้า Statement OCR ยังไม่ถูกติดตั้ง")
+    return FileResponse(page)

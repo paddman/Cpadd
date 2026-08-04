@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Statement OCR — Cpadd Cherry CFO</title>
+  <style>
+    :root{--bg:#071019;--panel:#0d1a25;--panel2:#122535;--line:#22384a;--text:#edf7ff;--muted:#8fa7b8;--accent:#59e1d2;--danger:#ff7a90;--warning:#ffd166;--success:#7ce3a1;--shadow:0 18px 50px rgba(0,0,0,.24)}
+    *{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at 80% -20%,#133b4a 0,transparent 35%),var(--bg);color:var(--text);min-height:100vh}button,input,select,textarea{font:inherit}button{cursor:pointer}.shell{max-width:1440px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px}.brand{display:flex;gap:12px;align-items:center}.mark{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),#d0fff8);color:#071019;font-weight:900}.brand h1{font-size:20px;margin:0}.brand p{margin:3px 0 0;color:var(--muted);font-size:13px}.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 14px;border-radius:10px;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.btn.primary{background:var(--accent);color:#071019;border-color:transparent}.btn:disabled{opacity:.45;cursor:not-allowed}.grid{display:grid;gap:16px}.two{grid-template-columns:minmax(340px,.75fr) minmax(0,1.25fr)}.card{background:linear-gradient(180deg,rgba(18,37,53,.96),rgba(13,26,37,.96));border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);min-width:0}.card h2,.card h3{margin:0 0 12px}.muted{color:var(--muted)}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field.full{grid-column:1/-1}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}input,select,textarea{width:100%;color:var(--text);background:#09151f;border:1px solid var(--line);border-radius:10px;padding:11px 12px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--accent)}input[type=file]{padding:18px;border-style:dashed}.check{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px}.check input{width:auto}.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.status{min-height:24px;margin-top:10px;color:var(--muted);white-space:pre-wrap}.status.good{color:var(--success)}.status.bad{color:var(--danger)}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}.metric{padding:13px;border:1px solid var(--line);border-radius:12px;background:#09151f}.metric small{color:var(--muted)}.metric b{display:block;margin-top:6px;font-size:18px}.warning-box{border:1px solid #6e5d24;background:rgba(75,57,11,.25);padding:12px;border-radius:12px;color:#ffe6a3;margin:12px 0}.hidden{display:none!important}table{width:100%;border-collapse:collapse}th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:13px}th{color:var(--muted);font-size:11px;text-transform:uppercase}.amount{text-align:right;white-space:nowrap;font-weight:800}.tag{display:inline-flex;padding:4px 8px;border-radius:999px;background:#183044;color:#b9d8ee;font-size:11px;font-weight:800}.tag.credit{background:#254632;color:#baf1ca}.tag.installment{background:#3c321a;color:#ffe19a}.scroll{overflow:auto;max-height:520px}.raw{white-space:pre-wrap;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;background:#071019;padding:14px;border-radius:12px;max-height:360px;overflow:auto;color:#c7d7e2}.recent-row{padding:11px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}.recent-row:last-child{border-bottom:0}.empty{text-align:center;color:var(--muted);padding:32px 12px}.privacy{font-size:12px;color:var(--muted);line-height:1.6;margin-top:14px}.toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap}@media(max-width:1000px){.two{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:620px){.shell{padding:14px}.top{align-items:flex-start;flex-direction:column}.form-grid,.metrics{grid-template-columns:1fr}.field.full{grid-column:auto}.actions .btn{flex:1}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <div class="brand"><div class="mark">C</div><div><h1>Statement OCR</h1><p>Cpadd · Cherry CFO</p></div></div>
+    <a class="btn" href="/">← กลับ Dashboard</a>
+  </div>
+  <div class="grid two">
+    <div class="grid">
+      <form id="uploadForm" class="card">
+        <h2>อ่าน Statement อัตโนมัติ</h2>
+        <p class="muted">PDF ที่มีข้อความจะดึงข้อความตรงก่อน ส่วน PDF สแกนและรูปภาพจะใช้ Tesseract ภาษาไทย + อังกฤษ จากนั้น Qwen จัดรายการให้เป็นโครงสร้าง</p>
+        <div class="form-grid">
+          <div class="field full"><label>ไฟล์ Statement</label><input id="statementFile" name="file" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.tif,.tiff" required></div>
+          <div class="field"><label>ขอบเขต</label><select name="scope"><option value="personal">ส่วนตัว</option><option value="business">บริษัท</option><option value="company_advance">สำรองจ่ายบริษัท</option></select></div>
+          <div class="field"><label>บัญชี / บัตร</label><input name="account" value="credit_card" placeholder="KBank Platinum 8406" required></div>
+          <div class="field full"><label class="check"><input name="use_qwen" type="checkbox" checked> ส่งข้อความ OCR ไปยัง Qwen endpoint ที่ตั้งไว้ เพื่อแยกรายการและหมวดหมู่</label></div>
+        </div>
+        <div class="actions"><button id="previewButton" class="btn primary" type="submit">OCR และสร้างตัวอย่าง</button></div>
+        <div id="uploadStatus" class="status"></div>
+        <div class="privacy">ระบบไม่เก็บไฟล์ต้นฉบับ เก็บเฉพาะข้อความ OCR และผลแยกรายการใน SQLite หากเปิดใช้ Qwen ข้อความ OCR ซึ่งอาจมีชื่อและเลขบัตรแบบปิดบางส่วนจะถูกส่งไปยัง endpoint ที่ตั้งไว้ ดังนั้นควรใช้ Local Qwen ก่อนเปิด Cpadd ออกอินเทอร์เน็ตต้องมี Login และ HTTPS เพราะชาวอินเทอร์เน็ตไม่ได้รับการอบรมให้เคารพเลขบัญชีของคนอื่น</div>
+      </form>
+      <div class="card">
+        <div class="toolbar"><h3>ประวัติการอ่าน</h3><button class="btn" onclick="loadHistory()">รีเฟรช</button></div>
+        <div id="history"><div class="empty">กำลังโหลด...</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div id="emptyPreview" class="empty">อัปโหลด Statement เพื่อดูผล OCR และเลือกรายการก่อนนำเข้า</div>
+      <div id="preview" class="hidden">
+        <div class="toolbar"><div><h2 id="fileTitle">Statement</h2><div id="engineLine" class="muted"></div></div><span id="statusTag" class="tag">previewed</span></div>
+        <div class="metrics">
+          <div class="metric"><small>ธนาคาร</small><b id="bankValue">-</b></div>
+          <div class="metric"><small>ยอดก่อนหน้า</small><b id="previousValue">-</b></div>
+          <div class="metric"><small>ยอดเรียกเก็บ</small><b id="dueValue">-</b></div>
+          <div class="metric"><small>ยอดรวม</small><b id="totalValue">-</b></div>
+        </div>
+        <div id="warnings" class="warning-box hidden"></div>
+        <div class="toolbar"><h3>รายการที่ตรวจพบ</h3><div><button class="btn" type="button" onclick="toggleAll(true)">เลือกทั้งหมด</button> <button class="btn" type="button" onclick="toggleAll(false)">ไม่เลือก</button></div></div>
+        <div class="scroll"><div id="transactionPreview"></div></div>
+        <div class="actions"><button id="importButton" class="btn primary" type="button" onclick="commitImport()">นำรายการที่เลือกเข้า Cash Flow</button></div>
+        <div id="importStatus" class="status"></div>
+        <details style="margin-top:18px"><summary class="muted" style="cursor:pointer">ดูข้อความ OCR ดิบ</summary><div id="rawText" class="raw" style="margin-top:10px"></div></details>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const $=id=>document.getElementById(id);const money=value=>value===null||value===undefined?'-':new Intl.NumberFormat('th-TH',{style:'currency',currency:'THB',maximumFractionDigits:2}).format(Number(value));const escapeHtml=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));let currentImport=null;
+async function jsonApi(path,options={}){const response=await fetch(path,{headers:{'Content-Type':'application/json',...(options.headers||{})},...options});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.detail||`HTTP ${response.status}`);return data}
+$('uploadForm').addEventListener('submit',async event=>{event.preventDefault();const button=$('previewButton');button.disabled=true;$('uploadStatus').className='status';$('uploadStatus').textContent='กำลังอ่านข้อความ อาจใช้เวลาตามจำนวนหน้าและความเมตตาของ CPU...';try{const form=new FormData(event.target);form.set('use_qwen',event.target.elements.use_qwen.checked?'true':'false');const response=await fetch('/api/statements/preview',{method:'POST',body:form});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.detail||`HTTP ${response.status}`);currentImport=data;renderPreview(data);$('uploadStatus').className='status good';$('uploadStatus').textContent=data.duplicate?'ไฟล์นี้เคยอ่านแล้ว จึงเปิดผลเดิมเพื่อกันข้อมูลซ้ำ':`อ่านสำเร็จ ${data.page_count} หน้า พบ ${data.transaction_count} รายการ`;loadHistory()}catch(error){$('uploadStatus').className='status bad';$('uploadStatus').textContent=error.message}finally{button.disabled=false}});
+function renderPreview(data){$('emptyPreview').classList.add('hidden');$('preview').classList.remove('hidden');$('fileTitle').textContent=data.filename;$('engineLine').textContent=`${data.ocr_engine||'-'} · ${data.extraction_method||'-'} · Parser ${data.parser||'-'}${data.model?' · '+data.model:''}`;$('statusTag').textContent=data.status;$('bankValue').textContent=data.bank||'-';$('previousValue').textContent=money(data.previous_balance);$('dueValue').textContent=money(data.amount_due);$('totalValue').textContent=money(data.total_balance);$('rawText').textContent=data.raw_text||'';const warnings=data.warnings||[];$('warnings').classList.toggle('hidden',warnings.length===0);$('warnings').innerHTML=warnings.map(x=>`• ${escapeHtml(x)}`).join('<br>');$('importButton').disabled=data.status==='imported';$('importStatus').textContent=data.status==='imported'?`นำเข้าแล้ว ${data.imported_count||0} รายการ`:'';const rows=data.transactions||[];if(!rows.length){$('transactionPreview').innerHTML='<div class="empty">ไม่พบรายการ ตรวจข้อความดิบหรือปรับภาพให้ชัดขึ้น</div>';$('importButton').disabled=true;return}$('transactionPreview').innerHTML=`<table><thead><tr><th></th><th>วันที่</th><th>รายการ</th><th>ประเภท</th><th>งวด</th><th class="amount">จำนวน</th></tr></thead><tbody>${rows.map(item=>{const checked=item.selected&&!item.imported_transaction_id&&item.transaction_date?'checked':'';const disabled=item.imported_transaction_id||!item.transaction_date?'disabled':'';const installment=item.installment_current&&item.installment_total?`<span class="tag installment">${item.installment_current}/${item.installment_total}</span>`:'-';return `<tr><td><input class="item-check" type="checkbox" data-index="${item.item_index}" ${checked} ${disabled}></td><td>${escapeHtml(item.transaction_date||'-')}<br><small class="muted">${escapeHtml(item.posting_date||'')}</small></td><td><b>${escapeHtml(item.description)}</b><br><small class="muted">${escapeHtml(item.category)} · confidence ${Math.round(Number(item.confidence||0)*100)}%</small></td><td><span class="tag ${item.direction==='credit'?'credit':''}">${escapeHtml(item.entry_type)}</span></td><td>${installment}</td><td class="amount">${money(item.amount)}</td></tr>`}).join('')}</tbody></table>`}
+function toggleAll(value){document.querySelectorAll('.item-check:not(:disabled)').forEach(input=>input.checked=value)}
+async function commitImport(){if(!currentImport)return;const selected=[...document.querySelectorAll('.item-check:checked')].map(input=>Number(input.dataset.index));if(!selected.length){$('importStatus').className='status bad';$('importStatus').textContent='ยังไม่ได้เลือกรายการ';return}$('importButton').disabled=true;$('importStatus').className='status';$('importStatus').textContent='กำลังนำเข้า...';try{const form=$('uploadForm');const result=await jsonApi(`/api/statements/${currentImport.id}/import`,{method:'POST',body:JSON.stringify({selected_indices:selected,scope:form.elements.scope.value,account:form.elements.account.value})});$('importStatus').className='status good';$('importStatus').textContent=`นำเข้าแล้ว ${result.imported_count} รายการ`;currentImport=await jsonApi(`/api/statements/${currentImport.id}`);renderPreview(currentImport);loadHistory()}catch(error){$('importButton').disabled=false;$('importStatus').className='status bad';$('importStatus').textContent=error.message}}
+async function loadHistory(){try{const rows=await jsonApi('/api/statements?limit=20');$('history').innerHTML=rows.length?rows.map(row=>`<div class="recent-row"><div><b>${escapeHtml(row.filename)}</b><br><small class="muted">${escapeHtml(row.bank||row.account)} · ${row.transaction_count||0} รายการ · ${escapeHtml(row.created_at)}</small></div><div style="text-align:right"><span class="tag">${escapeHtml(row.status)}</span><br><button class="btn" style="margin-top:6px;padding:6px 9px" onclick="openImport(${row.id})">เปิด</button></div></div>`).join(''):'<div class="empty">ยังไม่มีประวัติ</div>'}catch(error){$('history').innerHTML=`<div class="empty">${escapeHtml(error.message)}</div>`}}
+async function openImport(id){try{currentImport=await jsonApi(`/api/statements/${id}`);renderPreview(currentImport);window.scrollTo({top:0,behavior:'smooth'})}catch(error){$('uploadStatus').className='status bad';$('uploadStatus').textContent=error.message}}
+loadHistory();
+</script>
+</body>
+</html>
