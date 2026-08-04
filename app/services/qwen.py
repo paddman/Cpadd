@@ -82,44 +82,22 @@ def _headers(api_key: str) -> dict[str, str]:
     return headers
 
 
-async def test_qwen_connection() -> dict:
+async def call_qwen_chat(
+    messages: list[dict[str, str]],
+    *,
+    temperature: float | None = None,
+    max_tokens: int | None = None,
+) -> dict:
+    """Call the configured OpenAI-compatible Qwen endpoint."""
     config = get_qwen_settings(include_secret=True)
-    url = f"{config['base_url'].rstrip('/')}/models"
-    try:
-        async with httpx.AsyncClient(timeout=config["timeout_seconds"]) as client:
-            response = await client.get(url, headers=_headers(config["api_key"]))
-            response.raise_for_status()
-            payload = response.json()
-    except httpx.HTTPError as exc:
-        raise RuntimeError(f"เชื่อมต่อ Qwen ไม่สำเร็จ: {exc}") from exc
-
-    models = [item.get("id") for item in payload.get("data", []) if item.get("id")]
-    return {
-        "ok": True,
-        "base_url": config["base_url"],
-        "configured_model": config["model"],
-        "available_models": models[:30],
-        "model_found": config["model"] in models if models else None,
-    }
-
-
-async def chat_with_cfo(message: str, period: str, scope: str) -> dict:
-    config = get_qwen_settings(include_secret=True)
-    context = finance_context(period=period, scope=scope)
     url = f"{config['base_url'].rstrip('/')}/chat/completions"
     request_payload = {
         "model": config["model"],
-        "temperature": config["temperature"],
-        "max_tokens": config["max_tokens"],
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {
-                "role": "system",
-                "content": "ข้อมูลการเงินจริงจาก Cpadd:\n"
-                + json.dumps(context, ensure_ascii=False, default=str),
-            },
-            {"role": "user", "content": message},
-        ],
+        "temperature": (
+            config["temperature"] if temperature is None else temperature
+        ),
+        "max_tokens": config["max_tokens"] if max_tokens is None else max_tokens,
+        "messages": messages,
     }
 
     try:
@@ -144,11 +122,49 @@ async def chat_with_cfo(message: str, period: str, scope: str) -> dict:
     except (KeyError, IndexError, TypeError) as exc:
         raise RuntimeError("รูปแบบคำตอบจาก Qwen ไม่ตรง OpenAI-compatible API") from exc
 
-    usage = payload.get("usage") or {}
     return {
         "answer": answer,
         "model": payload.get("model", config["model"]),
-        "usage": usage,
+        "usage": payload.get("usage") or {},
+    }
+
+
+async def test_qwen_connection() -> dict:
+    config = get_qwen_settings(include_secret=True)
+    url = f"{config['base_url'].rstrip('/')}/models"
+    try:
+        async with httpx.AsyncClient(timeout=config["timeout_seconds"]) as client:
+            response = await client.get(url, headers=_headers(config["api_key"]))
+            response.raise_for_status()
+            payload = response.json()
+    except httpx.HTTPError as exc:
+        raise RuntimeError(f"เชื่อมต่อ Qwen ไม่สำเร็จ: {exc}") from exc
+
+    models = [item.get("id") for item in payload.get("data", []) if item.get("id")]
+    return {
+        "ok": True,
+        "base_url": config["base_url"],
+        "configured_model": config["model"],
+        "available_models": models[:30],
+        "model_found": config["model"] in models if models else None,
+    }
+
+
+async def chat_with_cfo(message: str, period: str, scope: str) -> dict:
+    context = finance_context(period=period, scope=scope)
+    result = await call_qwen_chat(
+        [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {
+                "role": "system",
+                "content": "ข้อมูลการเงินจริงจาก Cpadd:\n"
+                + json.dumps(context, ensure_ascii=False, default=str),
+            },
+            {"role": "user", "content": message},
+        ]
+    )
+    return {
+        **result,
         "period": period,
         "scope": scope,
     }
